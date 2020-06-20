@@ -1,5 +1,6 @@
 package com.un.currencyexchange.ui.home.adapters
 
+import android.content.SharedPreferences
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,14 +12,18 @@ import com.un.currencyexchange.models.AdapterItem
 import com.un.currencyexchange.util.Util
 import kotlinx.android.synthetic.main.currency_item_top.view.*
 
-class CurrencyAdapter constructor(private val list: ArrayList<AdapterItem>, private var oponent: AdapterItem, private val listener: OnCurrencyValueEdit?
+class CurrencyAdapter constructor(
+    private val list: ArrayList<AdapterItem>,
+    private var oponent: AdapterItem,
+    private val listener: OnCurrencyValueEdit?,
+    private val sharedPreferences: SharedPreferences
 ) : RecyclerView.Adapter<CurrencyAdapter.CurrencyVH>() {
 
-    private var comparedValue = 1.0
+    var comparedValue = 1.0
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CurrencyVH = CurrencyVH(
         LayoutInflater.from(parent.context).inflate(R.layout.currency_item_top, parent, false),
-        listener
+        listener, sharedPreferences
     )
 
     override fun getItemCount(): Int = list.size
@@ -35,7 +40,7 @@ class CurrencyAdapter constructor(private val list: ArrayList<AdapterItem>, priv
         diffResult.dispatchUpdatesTo(this)
     }
 
-    fun setComparableWith(activeBot: Int, adapterItem: AdapterItem) {
+    fun setComparableWith(adapterItem: AdapterItem) {
         oponent = adapterItem
         notifyItemRangeChanged(0, list.size - 1)
         comparedValue = 1.0
@@ -48,9 +53,11 @@ class CurrencyAdapter constructor(private val list: ArrayList<AdapterItem>, priv
         }
     }
 
-    class CurrencyVH constructor(private val view: View, private val listener: OnCurrencyValueEdit?) : RecyclerView.ViewHolder(view) {
+    class CurrencyVH constructor(private val view: View, private val listener: OnCurrencyValueEdit?, val sharedPreferences: SharedPreferences
+    ) : RecyclerView.ViewHolder(view) {
         fun bind(item: AdapterItem, oponent: AdapterItem, compareTo: Double) {
             view.tvCurrency.text = item.data.first
+            view.tvCurrentValue.text = String.format(view.context.getString(R.string.u_have_x), Util.getMyMoney(sharedPreferences, item.data.first))
             view.tvDESC.text = "1 ${item.data.first} = ${Util.formatString((oponent.data.second / item.data.second).toString(), 6)} ${oponent.data.first}"
             if (listener != null) {
                 view.etPrice.setText("1")

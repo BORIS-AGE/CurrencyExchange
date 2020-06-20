@@ -1,18 +1,17 @@
 package com.un.currencyexchange.ui.home
 
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import com.un.currencyexchange.models.AdapterItem
 import com.un.currencyexchange.models.MainErrorModel
 import com.un.currencyexchange.network.Api
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import java.util.*
 import javax.inject.Inject
 
-class HomeViewModel @Inject constructor(val api: Api) : ViewModel() {
+class HomePresenter @Inject constructor(val api: Api){
 
-    val rvItems = MutableLiveData<List<AdapterItem>>()
-    val error = MutableLiveData<String>()
+    private lateinit var callback: HomeView
 
     fun loadCurrencies() {
         val disposable = api.getCurrencies()
@@ -20,12 +19,16 @@ class HomeViewModel @Inject constructor(val api: Api) : ViewModel() {
             .map { it.rates.map { AdapterItem(Pair(it.key, it.value)) } }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
-                rvItems.value = it
-              //  android.os.Handler().postDelayed({loadCurrencies()}, 1000)
+                callback.onDataLoad(it)
+                android.os.Handler().postDelayed({loadCurrencies()}, 1800000)
             },{
                 if (it is MainErrorModel)
-                    error.value = it.text
+                    callback.onError(it.text)
             })
 
+    }
+
+    fun setCallback(homeFragment: HomeView) {
+        callback = homeFragment
     }
 }

@@ -3,5 +3,7 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="u_have_x">You have: 1s%</string>
+    <string name="u_have_x">You have: %s</string>
+    <string name="exchange">Exchange</string>
+    <string name="u_dont_have_money">You don\'t have enough money</string>
 </resources>
