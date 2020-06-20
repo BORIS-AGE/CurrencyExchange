@@ -1,20 +1,20 @@
 package com.un.currencyexchange.ui.home
 
-import androidx.lifecycle.MutableLiveData
 import com.un.currencyexchange.models.AdapterItem
 import com.un.currencyexchange.models.MainErrorModel
 import com.un.currencyexchange.network.Api
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import java.util.*
 import javax.inject.Inject
 
 class HomePresenter @Inject constructor(val api: Api){
 
     private lateinit var callback: HomeView
+    val disposable = mutableListOf<Disposable>()
 
     fun loadCurrencies() {
-        val disposable = api.getCurrencies()
+        disposable.add(api.getCurrencies()
             .subscribeOn(Schedulers.io())
             .map { it.rates.map { AdapterItem(Pair(it.key, it.value)) } }
             .observeOn(AndroidSchedulers.mainThread())
@@ -24,7 +24,7 @@ class HomePresenter @Inject constructor(val api: Api){
             },{
                 if (it is MainErrorModel)
                     callback.onError(it.text)
-            })
+            }))
 
     }
 

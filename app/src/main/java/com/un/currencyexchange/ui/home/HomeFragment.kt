@@ -125,4 +125,9 @@ class HomeFragment : BaseFragment(), CurrencyAdapter.OnCurrencyValueEdit, HomeVi
         }
     }
 
+    override fun onDestroy() {
+        presenter.disposable.forEach { it.dispose() }
+        super.onDestroy()
+    }
+
 }
